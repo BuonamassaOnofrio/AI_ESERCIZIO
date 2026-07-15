@@ -31,7 +31,13 @@ export class AppComponent {
   private readonly i18n = inject(I18nService);
   private readonly themeService = inject(ThemeService);
 
-  inputValue = '';
+  /**
+   * Bound via `[(ngModel)]` to an `<input type="number">`. Angular's
+   * NumberValueAccessor writes back a `number` (not a string) once the user
+   * types, and `null` when the field is cleared — so this can't be typed as
+   * plain `string` despite the initial value.
+   */
+  inputValue: string | number | null = '';
 
   readonly dict = this.i18n.dict;
   readonly lang = this.i18n.lang;
@@ -65,8 +71,9 @@ export class AppComponent {
 
   calculateSquareRoot(): void {
     const value = Number(this.inputValue);
+    const isEmpty = this.inputValue === '' || this.inputValue === null;
 
-    if (!this.inputValue || Number.isNaN(value)) {
+    if (isEmpty || Number.isNaN(value)) {
       this.state.set({ status: 'invalid' });
       return;
     }
