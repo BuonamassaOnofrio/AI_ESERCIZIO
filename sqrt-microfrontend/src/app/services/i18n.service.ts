@@ -1,7 +1,9 @@
 import { Injectable, computed, effect, signal } from '@angular/core';
 
+/** Languages supported by the UI. */
 export type Lang = 'it' | 'en';
 
+/** All user-facing strings for a single language. */
 export interface Dictionary {
   title: string;
   subtitle: string;
@@ -50,12 +52,20 @@ const DICTIONARIES: Record<Lang, Dictionary> = {
 
 const STORAGE_KEY = 'sqrt-microfrontend.lang';
 
+/**
+ * Runtime translation store. The active language is a signal so any
+ * component reading `dict()` re-renders immediately on language change —
+ * including already-computed results/errors, which are re-translated rather
+ * than frozen in the language they were produced in (see
+ * `AppComponent.resultText`).
+ */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   readonly lang = signal<Lang>(this.resolveInitialLang());
   readonly dict = computed<Dictionary>(() => DICTIONARIES[this.lang()]);
 
   constructor() {
+    // Keep <html lang> and the stored preference in sync with every change.
     effect(() => {
       const lang = this.lang();
       if (typeof document !== 'undefined') {
@@ -71,6 +81,11 @@ export class I18nService {
     this.lang.set(lang);
   }
 
+  /**
+   * Precedence: explicit user choice (localStorage) > browser locale > 'it'
+   * (the app's original/default language). Guards on `typeof` so this stays
+   * safe if ever run outside a browser (e.g. during prerendering).
+   */
   private resolveInitialLang(): Lang {
     if (typeof localStorage !== 'undefined') {
       const stored = localStorage.getItem(STORAGE_KEY);

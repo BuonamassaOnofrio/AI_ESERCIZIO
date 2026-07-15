@@ -3,12 +3,23 @@ import { FormsModule } from '@angular/forms';
 import { I18nService, Lang } from './services/i18n.service';
 import { ThemeService } from './services/theme.service';
 
+/**
+ * Outcome of the last `calculateSquareRoot()` call. Kept as raw data (not a
+ * pre-rendered string) so `resultText` can re-translate it whenever the
+ * language changes, instead of freezing the message in whatever language was
+ * active at calculation time.
+ */
 type CalculationState =
   | { status: 'idle' }
   | { status: 'invalid' }
   | { status: 'negative' }
   | { status: 'success'; value: number; sqrt: number };
 
+/**
+ * Square root calculator. Owns only the calculation state; language and
+ * theme are delegated to {@link I18nService} and {@link ThemeService} so
+ * both can be switched at runtime without reloading the page.
+ */
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -33,6 +44,7 @@ export class AppComponent {
     return status === 'invalid' || status === 'negative';
   });
 
+  /** Renders `state` in the current language; recomputes on every language switch. */
   readonly resultText = computed(() => {
     const state = this.state();
     const dict = this.dict();
