@@ -1,0 +1,54 @@
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<main class="stage">
+  <section class="panel">
+    <div class="panel__toolbar">
+      <div class="lang-switch" role="group" [attr.aria-label]="dict().languageLabel">
+        <button type="button" [class.is-active]="lang() === 'it'" (click)="setLang('it')">IT</button>
+        <span class="lang-switch__divider" aria-hidden="true">/</span>
+        <button type="button" [class.is-active]="lang() === 'en'" (click)="setLang('en')">EN</button>
+      </div>
+
+      <button
+        type="button"
+        class="theme-switch"
+        (click)="toggleTheme()"
+        [attr.aria-label]="theme() === 'dark' ? dict().themeToggleToLight : dict().themeToggleToDark"
+      >
+        @if (theme() === 'dark') {
+          <span aria-hidden="true">☀</span>
+        } @else {
+          <span aria-hidden="true">☾</span>
+        }
+      </button>
+    </div>
+
+    <header class="panel__header">
+      <span class="panel__eyebrow">f(x) = √x</span>
+      <h1>{{ dict().title }}</h1>
+      <p>{{ dict().subtitle }}</p>
+    </header>
+
+    <label for="numberInput">{{ dict().numberLabel }}</label>
+
+    <div class="radical">
+      <span class="radical__tick" aria-hidden="true"></span>
+      <div class="radical__field">
+        <input
+          id="numberInput"
+          type="number"
+          [(ngModel)]="inputValue"
+          [placeholder]="dict().placeholder"
+          inputmode="decimal"
+          (keyup.enter)="calculateSquareRoot()"
+        />
+      </div>
+    </div>
+
+    <button type="button" class="calculate" (click)="calculateSquareRoot()">{{ dict().calculate }}</button>
+
+    <div class="result" [class.error]="hasError()" aria-live="polite">
+      {{ resultText() }}
+    </div>
+  </section>
+</main>
